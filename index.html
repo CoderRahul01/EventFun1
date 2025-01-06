@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventHub - Event Management Platform</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <h1>EventHub</h1>
+            <p>Your Event, Our Priority</p>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="create-event-form">
+            <h2>Create New Event</h2>
+            <form id="eventForm">
+                <input type="text" id="eventName" placeholder="Event Name" required>
+                <input type="date" id="eventDate" required>
+                <textarea id="eventDescription" placeholder="Event Description" rows="4"></textarea>
+                <button type="submit">Create Event</button>
+            </form>
+        </div>
+
+        <div id="eventList">
+            <h2>Upcoming Events</h2>
+            <!-- Dynamic event items will be displayed here -->
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 EventHub. All Rights Reserved. | Powered by EventHub</p>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
