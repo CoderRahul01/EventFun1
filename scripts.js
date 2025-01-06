@@ -1,48 +1,86 @@
+// Function to render events dynamically
+const renderEvents = () => {
+    const eventListContainer = document.getElementById('eventList');
+    eventListContainer.innerHTML = ''; // Clear the existing events
+
+    const events = JSON.parse(localStorage.getItem('events')) || [];
+
+    if (events.length === 0) {
+        eventListContainer.innerHTML = `<p>No upcoming events</p>`;
+        return;
+    }
+
+    events.forEach((event, index) => {
+        const eventDiv = document.createElement('div');
+        eventDiv.classList.add('event');
+        eventDiv.innerHTML = `
+            <h3>${event.name}</h3>
+            <p><strong>Date:</strong> ${event.date}</p>
+            <p><strong>Description:</strong> ${event.description}</p>
+            <div class="event-buttons">
+                <button class="edit-btn" data-index="${index}">Edit Event</button>
+                <button class="delete-btn" data-index="${index}">Delete Event</button>
+            </div>
+        `;
+        eventListContainer.appendChild(eventDiv);
+    });
+};
+
+// Event listener for creating a new event
 document.getElementById('eventForm').addEventListener('submit', function(e) {
-    e.preventDefault(); // Prevent form submission from reloading the page
+    e.preventDefault();
 
     const eventName = document.getElementById('eventName').value;
     const eventDate = document.getElementById('eventDate').value;
     const eventDescription = document.getElementById('eventDescription').value;
 
     if (eventName && eventDate) {
-        // Create new event element
-        const newEvent = document.createElement('div');
-        newEvent.classList.add('event');
-        newEvent.innerHTML = `
-            <h3>${eventName}</h3>
-            <p><strong>Date:</strong> ${eventDate}</p>
-            <p><strong>Description:</strong> ${eventDescription}</p>
-            <div class="event-buttons">
-                <button class="edit-btn">Edit Event</button>
-                <button class="delete-btn">Delete Event</button>
-            </div>
-        `;
+        const newEvent = {
+            name: eventName,
+            date: eventDate,
+            description: eventDescription
+        };
 
-        // Add new event to the event list
-        document.getElementById('eventList').appendChild(newEvent);
+        const events = JSON.parse(localStorage.getItem('events')) || [];
+        events.push(newEvent);
+        localStorage.setItem('events', JSON.stringify(events));
 
-        // Clear input fields after adding the event
+        // Clear input fields
         document.getElementById('eventName').value = '';
         document.getElementById('eventDate').value = '';
         document.getElementById('eventDescription').value = '';
+
+        renderEvents(); // Re-render the events list
     } else {
         alert("Please fill in both the event name and date.");
     }
 });
 
-// Event delegation for edit and delete buttons
+// Event delegation for handling event edit and delete actions
 document.getElementById('eventList').addEventListener('click', function(e) {
-    if (e.target && e.target.classList.contains('delete-btn')) {
-        // Delete the event
-        e.target.parentElement.parentElement.remove();
-    } else if (e.target && e.target.classList.contains('edit-btn')) {
-        // Edit the event (can be expanded for real editing)
-        const eventDiv = e.target.parentElement.parentElement;
-        const eventName = eventDiv.querySelector('h3').textContent;
-        const eventDate = eventDiv.querySelector('p').textContent.replace('Date: ', '');
-        const eventDescription = eventDiv.querySelector('p:nth-of-type(2)').textContent.replace('Description: ', '');
+    const index = e.target.getAttribute('data-index');
+    const events = JSON.parse(localStorage.getItem('events')) || [];
 
-        alert(`Edit Event:\nName: ${eventName}\nDate: ${eventDate}\nDescription: ${eventDescription}`);
+    if (e.target && e.target.classList.contains('delete-btn')) {
+        events.splice(index, 1); // Delete the event
+        localStorage.setItem('events', JSON.stringify(events));
+        renderEvents(); // Re-render the events list
+    } else if (e.target && e.target.classList.contains('edit-btn')) {
+        const event = events[index];
+        const updatedName = prompt('Edit Event Name', event.name);
+        const updatedDate = prompt('Edit Event Date', event.date);
+        const updatedDescription = prompt('Edit Event Description', event.description);
+
+        if (updatedName && updatedDate) {
+            event.name = updatedName;
+            event.date = updatedDate;
+            event.description = updatedDescription;
+
+            localStorage.setItem('events', JSON.stringify(events));
+            renderEvents(); // Re-render the events list
+        }
     }
 });
+
+// Initialize the page with events from local storage
+document.addEventListener('DOMContentLoaded', renderEvents);
